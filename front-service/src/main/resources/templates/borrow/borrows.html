@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script
+            src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="/front/getBook">Book</a>
+
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/front/getBorrow">Borrow</a>
+
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+
+    <h3 style="text-align: center">Borrows</h3>
+    <a th:href="@{/front/borrowAdd}" class="btn btn-success" style="margin-bottom: 1rem; float: right;">Create</a>
+    <form th:action="@{/front/getBorrow}" style="margin-bottom: 1rem;" class="row">
+        <div class="col-md-5" >
+            <input type="date"  class="form-control input-sm" name="keyword" id="keyword" th:value="${keyword}" style="margin-bottom: 1rem;"/>
+
+        </div>
+        <div class="col-md-5" >
+
+            <select class="form-control input-sm" name="statusBorrow" id="statusBorrow" th:value="${statusBorrow}" style="margin-bottom: 1rem;">
+                <option th:value="${null}">Please select status...</option>
+                <option value="BORROWING">BORROWING</option>
+                <option value="GAVE_BACK">GAVE BACK</option>
+            </select>
+
+        </div>
+        <div class="col-last">
+            <input type="submit" value="Search" class="btn btn-primary" style="margin-left: 1rem"/>
+            <input type="button" value="Clear" id="btnClear" class="btn btn-secondary" onclick="clearSearch()" />
+
+        </div>
+
+
+
+    </form>
+
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Status</th>
+            <th scope="col">Date Start</th>
+            <th scope="col">Date End</th>
+            <th scope="col">Book Name</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="borrow: ${borrows}">
+            <td th:text="${borrow.idBorrow}"></td>
+            <td th:text="${borrow.statusBorrow}" th:style="${borrow.statusBorrow == 'BORROWING' ? 'color: blue' : 'color:red'}"></td>
+            <td th:text="${#dates.format(borrow.borrowDateStart, 'dd-MM-yyyy')}"></td>
+            <td th:text="${#dates.format(borrow?.borrowDateEnd, 'dd-MM-yyyy')}"></td>
+            <td th:text="${borrow.bookResponse.nameBook}"></td>
+            <td>
+                <button class="btn btn-danger" th:disabled="${borrow.statusBorrow == 'GAVE_BACK' ? true : false}"
+                ><a data-toggle="modal" data-target="#modal-delete"
+                   th:attr="data-target='#modal-delete'+${borrow.idBorrow}"  >Give back</a></button>
+                <div class="modal modal-delete" th:id="modal-delete+${borrow.idBorrow }">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 id="delModalLabel">Give back Confirmation</h3>
+                            </div>
+                            <div class="modal-body">
+                                <p class="error-text"><strong>Are you sure you want to
+                                    give back this book ?</strong></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn " data-dismiss="modal" aria-hidden="true">
+                                    Cancel
+                                </button>
+                                <a th:href="@{/front/give_back_book/{id}(id=${borrow.idBorrow})}" ><span class="btn btn-danger">Give back</span></a>
+                            </div>
+                        </div>
+                        <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script th:inline="javascript">
+    window.onload = function() {
+
+        var msg = [[${message}]];
+
+        if (msg == "Save Success") {
+            Command: toastr["success"]("Item added successfully!!")
+        } else if (msg == "Delete Success") {
+            Command: toastr["success"]("Item deleted successfully!!")
+        } else if (msg == "Delete Failure") {
+            Command: toastr["error"]("Some error occurred, couldn't delete item")
+        } else if (msg == "Edit Success") {
+            Command: toastr["success"]("Item updated successfully!!")
+        }else if (msg == "Give Back Success") {
+            Command: toastr["success"]("Item updated successfully!!")
+        }else if (msg == "Give Back Failure") {
+            Command: toastr["error"]("Some error occurred, couldn't give back item")
+        }
+
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+    }
+</script>
+<script>
+    $('#modal-delete').on('show.bs.modal', function (e) {
+        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
+        $('#modal-deleteHiddenId').val($(this).find('.btn-ok').attr('href'));
+    });
+</script>
+<script type="text/javascript">
+    function clearSearch() {
+        window.location = "[[@{/front/getBorrow}]]";
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script
+            src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <title>Title</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="/front/getBook">Book</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/front/getBorrow">Borrow</a>
+
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <h1 class="p-3"> Update Book </h1>
+
+    <form th:action="@{/front/save-edit-book}" th:object="${book}" method="POST">
+
+
+        <input type="hidden" th:field="*{idBook}" required="required" id="idBook"/>
+
+        <label class="col-md-3" for="nameBook">Name Book</label>
+        <div class="col-md-6">
+            <input type="text" th:field="*{nameBook}" required="required" id="nameBook"
+                   class="form-control input-sm"/>
+        </div>
+        <label class="col-md-3" for="genresBook">Genres Book</label>
+        <div class="col-md-6">
+            <input type="text" th:field="*{genresBook}" required="required" id="genresBook"
+                   class="form-control input-sm" />
+        </div>
+        <label class="col-md-3" for="totalBook">Total Book</label>
+        <div class="col-md-6">
+            <input type="text" th:field="*{totalBook}" required="required" id="totalBook"
+                   class="form-control input-sm"/>
+        </div>
+
+
+
+        <div class="row p-2">
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success">Save</button>
+            </div>
+        </div>
+
+
+    </form>
+</div>
+
+
+
+
+<script th:inline="javascript">
+    window.onload = function() {
+        /*<! [CDATA[*/
+        var msg = /*[[${message}]]*/ "";
+
+        /*]]>*/
+
+        if (msg == "Save Success") {
+            Command: toastr["success"]("Item added successfully!!")
+        } else if (msg == "Delete Success") {
+            Command: toastr["success"]("Item deleted successfully!!")
+        } else if (msg == "Delete Failure") {
+            Command: toastr["error"]("Some error occurred, couldn't delete item")
+        } else if (msg == "Edit Success") {
+            Command: toastr["success"]("Item updated successfully!!")
+        }
+        else if (msg == "Save Failure") {
+            Command: toastr["error"]("Item added Failure!!")
+        }
+        else if (msg == "Edit Failure") {
+            Command: toastr["error"]("Item edit Failure!!")
+        }
+
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+    }
+</script>
+</body>
+</html>
