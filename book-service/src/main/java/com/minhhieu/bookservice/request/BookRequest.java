@@ -12,4 +12,5 @@ public class BookRequest {
     private String nameBook;
     private String genresBook;
     private int totalBook;
+    private String img;
 }
