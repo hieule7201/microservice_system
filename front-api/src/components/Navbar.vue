@@ -11,11 +11,9 @@
                 <div class="navbar-nav mr-auto">
                   <router-link v-for="link in links" :key="link.name" :to="link.path" class="nav-item nav-link text-uppercase">{{link.name}}</router-link>
                 </div>
-                <div class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
 
-                </div>
               <router-link :to="{path: '/login'}" class="btn btn-outline-success my-2 my-sm-0" >Login</router-link>
+
             </div>
         </div>
     </nav>
@@ -30,5 +28,8 @@ import {links} from "@/static.js";
 <style scoped>
 .link-active{
   font-weight: 600;
+}
+.search-home:focus .box-data{
+  display: block;
 }
 </style>

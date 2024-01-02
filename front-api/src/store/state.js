@@ -1,3 +1,6 @@
 export default {
-  meals: "Salmon",
+  allBooks: [],
+  messageAPI: String,
+  bookDetail: Object,
+  borrows: []
 };

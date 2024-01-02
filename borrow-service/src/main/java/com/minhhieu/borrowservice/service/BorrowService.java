@@ -9,9 +9,9 @@ import java.time.Instant;
 import java.util.List;
 
 public interface BorrowService {
-    boolean borrowBook(BorrowRequest borrowRequest);
+    String borrowBook(BorrowRequest borrowRequest);
     BorrowResponse showDetail(long idBorrow);
     List<BorrowResponse> getBorrow(String keyword, String statusBorrow) throws ParseException;
 
-    boolean giveBackBook(long idBorrow);
+    String giveBackBook(long idBorrow);
 }

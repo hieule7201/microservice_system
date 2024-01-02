@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,37 +59,46 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean addBook(BookRequest bookRequest, MultipartFile img) throws IOException {
-        String newName = generateNewFileName(img.getOriginalFilename());
+    public Resource getImgByName(String img) {
+        Path imagePath = Paths.get(folder + img);
+        try {
+             return new UrlResource(imagePath.toUri());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
 
-        String filePath = folder+newName;
-        Path newImgPath = Path.of(folder, getLastSegment(newName));
+
+    }
+
+    @Override
+    public String addBook(BookRequest bookRequest, MultipartFile img) throws IOException {
+        String newName = generateNewFileName(img.getOriginalFilename());
+        System.out.println(newName);
+        Path newImgPath = Path.of(folder, newName);
         Files.copy(img.getInputStream(), newImgPath, StandardCopyOption.REPLACE_EXISTING);
         Book book = Book.builder()
                 .nameBook(bookRequest.getNameBook())
                 .genresBook(bookRequest.getGenresBook())
                 .totalBook(bookRequest.getTotalBook())
-                .img(filePath).build();
+                .img(newName).build();
         bookRepository.save(book);
-        return true;
+        return "Add Successfully";
     }
 
     @Override
-    public boolean upDateBook(MultipartFile img, BookRequest bookRequest, long idBook) {
+    public String upDateBook(MultipartFile img, BookRequest bookRequest, long idBook) {
 
        return bookRepository.findById(idBook).map(item -> {
 
            try {
-               String filePath = folder+getLastSegment(item.getImg());
-               Path newImgPath = Path.of(folder, getLastSegment(item.getImg()));
+               Path newImgPath = Path.of(folder, item.getImg());
                Files.deleteIfExists(newImgPath);
-               img.transferTo(new File(filePath));
+               Files.copy(img.getInputStream(), newImgPath, StandardCopyOption.REPLACE_EXISTING);
                item.setNameBook(bookRequest.getNameBook());
                item.setGenresBook(bookRequest.getGenresBook());
                item.setTotalBook(bookRequest.getTotalBook());
-               item.setImg(filePath);
                bookRepository.save(item);
-               return true;
+               return "Update Successfully";
            } catch (IOException e) {
                throw new RuntimeException(e);
            }
@@ -96,7 +106,7 @@ public class BookServiceImpl implements BookService {
 
         }).orElseGet(()-> {
 
-           return false;
+           throw new RuntimeException("not found");
        });
     }
 
@@ -117,12 +127,17 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean deleteBook(long idBook) {
-
-        if (bookRepository.findById(idBook).isEmpty())
-            return false;
-        bookRepository.deleteById(idBook);
-        return true;
+    public String deleteBook(long idBook) {
+        return bookRepository.findById(idBook).map((item)->{
+            Path newImgPath = Path.of(folder, item.getImg());
+            try {
+                Files.deleteIfExists(newImgPath);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            bookRepository.deleteById(idBook);
+            return "Delete Successfully";
+        }).orElseThrow(()-> new RuntimeException("not found"));
 
     }
 
@@ -131,15 +146,7 @@ public class BookServiceImpl implements BookService {
 
         return System.currentTimeMillis() + getFileExtension(originalFileName);
     }
-    private String getLastSegment(String fullPath) {
-        int lastSlashIndex = fullPath.lastIndexOf('/');
-        if (lastSlashIndex >= 0 && lastSlashIndex < fullPath.length() - 1) {
-            return fullPath.substring(lastSlashIndex + 1);
-        } else {
-            // No '/' found or the last character is '/', return the original path
-            return fullPath;
-        }
-    }
+
     private String getFileExtension(String originalFilename) {
         // Extract and return the file extension
         int dotIndex = originalFilename.lastIndexOf(".");

@@ -1,7 +1,7 @@
 import { createStore } from "vuex";
 
 import * as mutations from "./mutations";
-import * as actions from "./actions";
+import * as actions from "./actions/index.js";
 import * as getters from "./getters";
 import state from "./state";
 

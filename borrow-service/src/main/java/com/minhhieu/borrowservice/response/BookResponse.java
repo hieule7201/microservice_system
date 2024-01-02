@@ -13,4 +13,5 @@ public class BookResponse {
     private String nameBook;
     private String genresBook;
     private int totalBook;
+    private String img;
 }

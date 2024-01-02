@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import java.util.List;
 
 
-@FeignClient(name = "book-service", url = "http://localhost:8090/book")
+@FeignClient(name = "book-service", path = "book")
 public interface BookService {
 
     @PutMapping("/reduce_total/{idBook}")

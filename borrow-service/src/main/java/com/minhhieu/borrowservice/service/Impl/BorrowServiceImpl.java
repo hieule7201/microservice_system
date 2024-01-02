@@ -26,7 +26,7 @@ public class BorrowServiceImpl implements BorrowService {
     BookService bookService;
 
     @Override
-    public boolean borrowBook(BorrowRequest borrowRequest) {
+    public String borrowBook(BorrowRequest borrowRequest) {
         bookService.reduceTotal(borrowRequest.getIdBook());
         Borrow borrow = Borrow.builder()
                 .statusBorrow("BORROWING")
@@ -36,7 +36,7 @@ public class BorrowServiceImpl implements BorrowService {
                 .build();
 
         borrowRepository.save(borrow);
-        return true;
+        return "Borrow Successfully";
     }
 
     @Override
@@ -47,7 +47,6 @@ public class BorrowServiceImpl implements BorrowService {
 
     @Override
     public List<BorrowResponse> getBorrow(String keyword, String statusBorrow) throws ParseException {
-        BookResponse bookResponse = new BookResponse();
         List<BorrowResponse> borrowResponseList = new ArrayList<>();
         if (keyword != null && !keyword.isEmpty() && statusBorrow != null && !statusBorrow.isEmpty()){
             borrowRepository.findAllByBorrowDateStartAndStatusBorrow(new SimpleDateFormat("yyyy-MM-dd").parse(keyword),statusBorrow).forEach((item)->{
@@ -74,14 +73,14 @@ public class BorrowServiceImpl implements BorrowService {
     }
 
     @Override
-    public boolean giveBackBook(long idBorrow) {
+    public String giveBackBook(long idBorrow) {
         return borrowRepository.findById(idBorrow).map(item ->{
             bookService.returnTotal(item.getIdBook());
             item.setStatusBorrow("GAVE_BACK");
             item.setBorrowDateEnd(new Date());
 
             borrowRepository.save(item);
-            return true;
+            return "Give Back Successfully";
         }).orElseThrow(()->new RuntimeException("Not found"));
 
     }
